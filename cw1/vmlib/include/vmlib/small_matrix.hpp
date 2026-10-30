@@ -128,11 +128,72 @@ tMatrix make_identity() noexcept
 template< std::size_t tN, typename tType, std::size_t tM > inline 
 void gauss( SmallMat<tN,tN,tType> aMat, SmallMat<tN,tM,tType>& aResult ) noexcept
 {
+	for (std::size_t p = 0; p < tN; ++p){
+		std::size_t pivotRow = p;
+		for (std::size_t row = p+1; row < tN; ++row){
+				if (std::abs(aMat[row,p]) > std::abs(aMat[pivotRow,p]))
+				{
+   				 	pivotRow = row;
+				 
+				}
+		}
+		if (pivotRow != p)
+				{
+    				for (std::size_t col = 0; col < tN; ++col)
+    				{
+        				std::swap(aMat[p,col], aMat[pivotRow,col]);
+    				}
+					for (std::size_t col = 0; col < tM; ++col){
+						std::swap(aResult[p,col], aResult[pivotRow,col]);
+					}
+				}
+			
+		for (std::size_t row = p+1; row < tN; ++row){
+
+			tType factor = aMat[row,p] / aMat[p,p];
+			 for (std::size_t col = p; col < tN; ++col){
+				aMat[row,col] -= factor * aMat[p,col];
+			 }
+			 for (std::size_t col = 0; col < tM; ++col){
+				aResult[row,col] -= factor * aResult[p,col];
+			 }
+	}
+}
+	for (std::size_t p = tN; p-- > 0;)
+	{
+		for (std::size_t row = 0; row < p; ++row){
+		tType factor2 = aMat[row,p]/aMat[p,p];
+		 for (std::size_t col = p; col < tN; ++col){
+				aMat[row,col] -= factor2 * aMat[p,col];
+			 }
+		for (std::size_t col = 0; col < tM; ++col){
+				aResult[row,col] -= factor2 * aResult[p,col];
+			 }
+		}
+		}
+	for (std::size_t p = 0; p < tN; ++p)
+	{
+    	tType diagonal = aMat[p,p];
+		for (std::size_t col = 0; col < tM; ++col){
+			aResult[p,col] /= diagonal;
+		}
+}
+}
 	// TODO-Task 2.1 only: implement me
+
+
+
+template< std::size_t tN, typename tType >
+SmallMat<tN,tN,tType> invert( SmallMat<tN,tN,tType> const& aMat ) noexcept
+{
+    SmallMat<tN,tN,tType> result{};
+	for (std::size_t i = 0; i < tN; ++i){
+		result[i,i] = 1;
+	}
+gauss(aMat, result);
+return result;
 }
 
-template< std::size_t tN, typename tType > // Must be square!
-SmallMat<tN,tN,tType> invert( SmallMat<tN,tN,tType> const& ) noexcept;
 
 template<>
 SmallMat<4,4,float> invert( SmallMat<4,4,float> const& ) noexcept;
